@@ -28,6 +28,43 @@
 
 #include "hal.h"
 
+/**
+ * @brief   Milliseconds to system ticks.
+ * @details Converts from milliseconds to system ticks number.
+ * @note    The result is rounded upward to the next tick boundary.
+ *
+ * @param[in] msec      number of milliseconds
+ * @return              The number of ticks.
+ *
+ * @api
+ */
+#ifndef OSAL_MS2ST
+#define OSAL_MS2ST(msec)                                                    \
+  ((systime_t)((((uint32_t)(msec)) *                                        \
+                ((uint32_t)OSAL_ST_FREQUENCY) + 999UL) / 1000UL))
+#endif
+
+/**
+ * @brief   Checks if the specified time is within the specified time window.
+ * @note    When start==end then the function returns always true because the
+ *          whole time range is specified.
+ * @note    This function can be called from any context.
+ *
+ * @param[in] time      the time to be verified
+ * @param[in] start     the start of the time window (inclusive)
+ * @param[in] end       the end of the time window (non inclusive)
+ * @retval true         current time within the specified time window.
+ * @retval false        current time not within the specified time window.
+ *
+ * @xclass
+ */
+static inline bool osalOsIsTimeWithinX(systime_t time,
+                                       systime_t start,
+                                       systime_t end) {
+
+  return (bool)((time - start) < (end - start));
+}
+
 #if HAL_USE_I2C || defined(__DOXYGEN__)
 
 /*===========================================================================*/
